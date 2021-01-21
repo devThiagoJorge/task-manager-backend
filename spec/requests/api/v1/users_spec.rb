@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Users Api', type: :request do
     let!(:user) { create(:user) } 
-    let(:user_id) { user.id } 
+    let(:user_id) { user.id }  
 
     before { host! 'api.taskmanager.test' }
 
@@ -25,7 +25,7 @@ RSpec.describe 'Users Api', type: :request do
 
         context 'when the user does not exist' do
             let(:user_id) { 10000 } 
-            it 'returns status code 200' do
+            it 'returns status code 404' do
                 expect(response).to have_http_status(404)
             end
         end
@@ -64,4 +64,51 @@ RSpec.describe 'Users Api', type: :request do
             end
         end
     end
+
+    describe 'PUT /users/:id' do
+        before do 
+            headers = { 'Accept' => 'application/api.taskmanager.v1' }
+            put "/users/#{user_id}", params: {user: user_params}, headers: headers
+        end
+
+        context 'when the user_params are valid ' do
+            let(:user_params) { { email: "newemail@taskmanager.com" } } 
+            it 'returns status code 200' do
+                expect(response).to have_http_status(200)
+            end
+
+            it 'returns for the updated user' do
+                user_response = JSON.parse(response.body, symbolize_names: true)
+                expect(user_response[:email]).to eq(user_params[:email])
+            end   
+        end
+
+        context 'when the user_params are invalid ' do
+            let(:user_params) { { email: "newemail.com" } } 
+            it 'returns status code 422' do
+                expect(response).to have_http_status(422)
+            end
+
+            it 'returns the json data for the errors' do
+                user_response = JSON.parse(response.body, symbolize_names: true)
+                expect(user_response).to have_key(:errors)
+            end   
+        end
+    end
+    
+    describe 'DELETE /users/:id' do
+        before do
+            headers = { 'Accept' => 'application/api.taskmanager.v1' }
+            delete "/users/#{user_id}", params: {}, headers: headers
+        end
+        it 'returns status code 204' do
+            expect(response).to  have_http_status(204)
+        end
+
+        it 'removes the user to database' do
+            expect(User.find_by(id: user_id)).to be_nil
+        end
+        
+    end
+    
 end
