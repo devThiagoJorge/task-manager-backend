@@ -15,7 +15,8 @@ gem 'puma', '~> 3.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platform: :mri
+  #gem 'byebug', platform: :mri
+  gem 'byebug', '~> 9.0', '>= 9.0.6'
   gem 'rspec-rails', '~> 3.5'
   gem 'spring-commands-rspec' #beeter perfomance in tests just Linus or Mac OS
 end

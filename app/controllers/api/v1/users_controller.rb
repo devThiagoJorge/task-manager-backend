@@ -11,14 +11,12 @@ class Api::V1::UsersController < ApplicationController
     end
 
     def create
-        begin
              user = User.new(user_params)
         if user.save
             return render json: user, status: 201
+        else
+            render json: { errors: user.errors }, status: 422
         end 
-        rescue => exception
-             head 400
-        end
     end
 
     private

@@ -14,8 +14,8 @@ RSpec.describe 'Users Api', type: :request do
 
         context 'when the user exist' do
             it 'returns the user' do
-                user_response = JSON.parse(response.body)
-                expect(user_response['id']).to equal(user_id)
+                user_response = JSON.parse(response.body, symbolize_names: true)
+                expect(user_response[:id]).to equal(user_id)
             end
 
             it 'returns status code 200' do
@@ -46,19 +46,22 @@ RSpec.describe 'Users Api', type: :request do
             end
             
             it 'returns json data for the new user' do
-                user_response = JSON.parse(response.body)
-                expect(user_response['email']).to eq(user_params[:email])
+                user_response = JSON.parse(response.body, symbolize_names: true)
+                expect(user_response[:email]).to eq(user_params[:email])
             end
         end
         
-
         context 'when the body of request are invalid' do
-            let(:user_params) { nil }
-            it 'return status code 400 (bad request)' do 
-                expect(response).to  have_http_status(400)
+            let(:user_params) { attributes_for(:user, email: 'inavalid_email@') } 
+
+            it 'return status code 422' do
+                expect(response).to  have_http_status(422)
+            end
+
+            it "returns the json data for the errors" do
+                user_response = JSON.parse(response.body, symbolize_names: true)
+                expect(user_response).to have_key(:errors)
             end
         end
-        
     end
-    
 end
