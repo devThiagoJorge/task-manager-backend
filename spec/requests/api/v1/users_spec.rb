@@ -55,7 +55,7 @@ RSpec.describe 'Users Api', type: :request do
         end
         
         context 'when the body of request are invalid' do
-            let(:user_params) { attributes_for(:user, email: 'inavalid_email@') } 
+            let(:user_params) { attributes_for(:user, email: 'invalid_email@') } 
 
             it 'return status code 422' do
                 expect(response).to  have_http_status(422)
