@@ -10,7 +10,7 @@ RSpec.describe 'Sessions Api', type: :request do
         }
     end 
 
-    describe "Post /sessions" do
+    describe "POST /sessions" do
         before do
             post "/sessions", params: { session: credentials }.to_json, headers: headers
         end
@@ -32,7 +32,7 @@ RSpec.describe 'Sessions Api', type: :request do
         context "when the credentials are incorrect" do
             let(:credentials) { { email: user.email, password: 'password_incorrect'} } 
 
-            it 'returns status code 200' do
+            it 'returns status code 401' do
                 expect(response).to  have_http_status(401)
             end
 
@@ -44,5 +44,21 @@ RSpec.describe 'Sessions Api', type: :request do
         end
         
     end
+
+    describe "DELETE /sessions" do
+        let(:auth_token) { user.auth_token } 
+        before do
+            delete "/sessions/#{auth_token}", params:{}, headers: headers
+        end
+        
+        it 'returns status code 204' do
+            expect(response).to  have_http_status(204)
+        end
+
+        it 'changes the user auth token' do
+            expect(User.find_by(auth_token: auth_token)).to  be_nil
+        end
+    end
+    
     
 end
